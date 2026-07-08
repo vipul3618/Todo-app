@@ -1,0 +1,36 @@
+version: "3.9"
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: mysql-db
+    restart: always
+
+    environment:
+      MYSQL_ROOT_PASSWORD: root123
+      MYSQL_DATABASE: mytododb
+      MYSQL_USER: todo_user
+      MYSQL_PASSWORD: password123
+
+    ports:
+      - "3306:3306"
+
+    volumes:
+      - mysql-data:/var/lib/mysql
+      - ./todo-db.sql:/docker-entrypoint-initdb.d/todo-db.sql
+
+  flask-app:
+    build: .
+    container_name: flask-todo-app
+
+    ports:
+      - "5000:5000"
+
+    depends_on:
+      - mysql
+
+    env_file:
+      - .env
+
+volumes:
+  mysql-data:
